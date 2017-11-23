@@ -1,0 +1,75 @@
+job "chat_take_aiohttp-$BRANCH_NAME" {
+  datacenters = ["$DATACENTER"]
+
+  type = "service"
+
+  update {
+    max_parallel = 1
+    stagger = "10s"
+  }
+
+  group "chat_take_aiohttp-$BRANCH_NAME-web" {
+    count = 1
+
+    restart {
+      mode = "delay"
+      attempts = 3
+      interval = "30s"
+      delay = "10s"
+    }
+
+    task "chat_take_aiohttp-$BRANCH_NAME-web" {
+      driver = "docker"
+
+      env {
+        SIMPLE_SETTINGS = "chat_take_aiohttp.settings.develop"
+        CASSANDRA_HOSTS = "$CASSANDRA_HOSTS"
+        CASSANDRA_USER = "$CASSANDRA_USER"
+        CASSANDRA_PASSWORD = "$CASSANDRA_PASSWORD"
+        CONSUL_HTTP_ADDR = "${meta.consul_http_addr}"
+        STATSD_HOST = "$STATSD_HOST"
+        STATSD_PORT = "$STATSD_PORT"
+        COMMAND_NAME = "serve"
+      }
+
+      config {
+        image = "docker-infra.cian.ru/chat_take_aiohttp:$IMAGE_TAG"
+
+        port_map {
+          http = 80
+        }
+
+        auth {
+          username = "$DOCKER_REGISTRY_USERNAME"
+          password = "$DOCKER_REGISTRY_PASSWORD"
+        }
+      }
+
+      service {
+        port = "http"
+        name = "$BRANCH_NAME--chat_take_aiohttp"
+        tags = ["http-dev"]
+
+        check {
+          type = "http"
+          port = "http"
+          path = "/ping/"
+          interval = "1s"
+          timeout = "1s"
+        }
+      }
+
+      resources {
+        cpu = 100
+        memory = 128
+
+        network {
+          mbits = 1
+
+          port "http" {
+          }
+        }
+      }
+    }
+  }
+}

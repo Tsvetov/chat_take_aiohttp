@@ -1,0 +1,36 @@
+job "chat_take_aiohttp-cron" {
+  datacenters = ["$DATACENTER"]
+
+  type = "batch"
+
+  periodic {
+    cron             = "*/30 * * * * * *"
+    prohibit_overlap = true
+  }
+
+  group "cron-group" {
+
+    count = 1
+
+    task "cron-task" {
+      driver = "docker"
+
+      config {
+        image = "docker-infra.cian.ru/chat_take_aiohttp:$IMAGE_TAG"
+
+        auth {
+          username = "$DOCKER_REGISTRY_USERNAME"
+          password = "$DOCKER_REGISTRY_PASSWORD"
+        }
+
+        command = "sleep" # insert your task command here
+        args = ["1"] # args passed to command
+      }
+
+      env {
+        CONSUL_HTTP_ADDR = "${meta.consul_http_addr}"
+      }
+
+    }
+  }
+}

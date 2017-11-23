@@ -1,0 +1,78 @@
+job "chat_take_aiohttp" {
+  datacenters = ["$DATACENTER"]
+
+  type = "service"
+
+  update {
+    max_parallel = 1
+    stagger = "10s"
+  }
+
+  group "chat_take_aiohttp-web" {
+    count = 3
+
+    restart {
+      mode = "delay"
+      attempts = 3
+      interval = "30s"
+      delay = "10s"
+    }
+
+    task "chat_take_aiohttp-web" {
+      driver = "docker"
+
+      shutdown_delay = "10s"
+
+      env {
+        SIMPLE_SETTINGS = "chat_take_aiohttp.settings.production"
+        CASSANDRA_HOSTS = "$CASSANDRA_HOSTS"
+        CASSANDRA_USER = "$CASSANDRA_USER"
+        CASSANDRA_PASSWORD = "$CASSANDRA_PASSWORD"
+        CONSUL_HTTP_ADDR = "${meta.consul_http_addr}"
+        SYSLOG_JSON_FORWARD_IP = "$SYSLOG_JSON_FORWARD_IP"
+        SYSLOG_JSON_FORWARD_PORT = "$SYSLOG_JSON_FORWARD_PORT"
+        STATSD_HOST = "$STATSD_HOST"
+        STATSD_PORT = "$STATSD_PORT"
+        COMMAND_NAME = "serve"
+      }
+
+      config {
+        image = "docker-infra.cian.ru/chat_take_aiohttp:$IMAGE_TAG"
+
+        port_map {
+          http = 80
+        }
+
+        auth {
+          username = "$DOCKER_REGISTRY_USERNAME"
+          password = "$DOCKER_REGISTRY_PASSWORD"
+        }
+      }
+
+      service {
+        port = "http"
+        name = "chat_take_aiohttp"
+        tags = ["micro.cian.tech", "production"]
+
+        check {
+          type = "http"
+          path = "/ping/"
+          interval = "5s"
+          timeout = "2s"
+        }
+      }
+
+      resources {
+        cpu = 2048
+        memory = 512
+
+        network {
+          mbits = 1
+
+          port "http" {
+          }
+        }
+      }
+    }
+  }
+}
