@@ -86,10 +86,38 @@ class Register(HandlersMixinAccount, web.View):
         await self.login_user(user)
 
 
-class Login(web.View):
+class Login(HandlersMixinAccount, web.View):
     """ Вход пользователя """
+
+    template_name = 'login.html'
+
+    @anonymous_required
+    @aiohttp_jinja2.template(template_name)
     async def get(self):
-        return web.Response(text='OK')
+        return {}
+
+    @anonymous_required
+    async def post(self):
+        username, password = await self.get_normalize_data()
+        is_valid = await self.is_valid(username, password)
+        if not is_valid:
+            redirect(self.request, 'login')
+        try:
+            user = await self.request.app.objects.get(
+                Users,
+                Users.username ** username,
+                Users.password ** hashlib.md5(password.encode()).hexdigest()
+            )
+            await self.login_user(user)
+        except Users.DoesNotExist:
+            add_message(self.request, 'danger', f'User {username} not found')
+            redirect(self.request, 'login')
+
+    async def login_user(self, user):
+        self.request.session['user'] = str(user.id)
+        self.request.session['time'] = str(time())
+        add_message(self.request, 'info', f'Hello {user}!')
+        redirect(self.request, 'index')
 
 
 class Logout(web.View):
