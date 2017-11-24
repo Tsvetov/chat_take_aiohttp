@@ -1,2 +1,17 @@
+aiohttp==2.3.3
+async-timeout==2.0.0
+chardet==3.0.4
 click==6.7
+multidict==3.3.2
 simple-settings==0.12.0
+yarl==0.15.0
+aiohttp-autoreload==0.0.1
+aiohttp-jinja2==0.14.0
+jinja2==2.10
+aiopg==0.13.0
+aiohttp-session==0.8.0
+aioredis==0.3.0
+async-timeout==2.0.0
+peewee==2.10.2
+peewee-async==0.5.10
+aiohttp-debugtoolbar=0.4.1
