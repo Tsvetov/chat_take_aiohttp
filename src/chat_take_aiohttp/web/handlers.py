@@ -31,7 +31,7 @@ class HandlersMixinAccount:
             'warning',
             'username or password not valid'
         )
-        return True
+        return False
 
     async def login_user(self, user):
         """ Put user to session and redirect to Index """
