@@ -52,7 +52,7 @@ job "chat_take_aiohttp" {
       service {
         port = "http"
         name = "chat_take_aiohttp"
-        tags = ["micro.cian.tech", "production"]
+        tags = ["micro.tech", "production"]
 
         check {
           type = "http"

@@ -50,7 +50,7 @@ job "chat_take_aiohttp-$STAGE_NAME" {
       service {
         port = "http"
         name = "chat_take_aiohttp--$STAGE_NAME"
-        tags = ["micro.cian.tech", "beta"]
+        tags = ["micro.tech", "beta"]
 
         check {
           type = "http"
