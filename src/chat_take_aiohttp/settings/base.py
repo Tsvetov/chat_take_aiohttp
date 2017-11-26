@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List
 
@@ -22,3 +23,9 @@ BASE_DIR = os.path.dirname(__file__)
 TEMPLATE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'templates')
 
 STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), 'static')
+
+logger = logging.getLogger('app')
+logger.setLevel(logging.DEBUG)
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+logger.addHandler(console)

@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>{% block title %}Simple asyncio chat{% endblock %}</title>
+    <title>{% block title %}Очередной чат{% endblock %}</title>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="{{ app.router.static.url(filename='sidebar.css') }}" rel="stylesheet">
-    <!--<link href="{{ app.router.static.url(filename='signin.css') }}" rel="stylesheet">-->
-    <!--<link href="{{ app.router.static.url(filename='chat.css') }}" rel="stylesheet">-->
+    <link href="{{ app.router.static.url(filename='signin.css') }}" rel="stylesheet">
+    <link href="{{ app.router.static.url(filename='chat.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -34,12 +34,12 @@
                         <i class="fa fa-sign-out fa-lg"></i> LogOut from {{ request.user }}
                     </a>
                 </li>
-                <li data-toggle="collapse" data-target="#rooms" class="collapsed{% if request.path.startswith('/chat') %} active{% endif %}">
-                    <a><i class="fa fa-weixin fa-lg"></i> Chat rooms <span class="arrow"></span></a>
+                <li data-toggle="collapse" data-target="#rooms" class="">
+                    <a><i class="fa fa-weixin fa-lg"></i> Список чатов <span class="arrow"></span></a>
                 </li>
                 <ul class="sub-menu collapse{% if request.path.startswith('/chat') %} in{% endif %}" id="rooms">
                     <li{% if request.match_info._route.name == 'create_room' %} class="active"{% endif %}>
-                        <a href="{{ app.router['create_room'].url_for() }}">Create new room</a></li>
+                        <a href="{{ app.router['create_room'].url_for() }}">Создать новый чат</a></li>
                     {% for room in chat_rooms %}
                         <li{% if request.match_info._route.name == 'room' and request.match_info['slug'] == room.name %} class="active"{% endif %}>
                             <a href="{{ app.router['room'].url_for(slug=room.name) }}">#{{ room.name }}</a></li>
@@ -78,14 +78,13 @@
             {% endfor %}
 
             {% block content %}
-                <h4>This is suppose to be in the main content</h4>
             {% endblock %}
         </div>
     </div>
 </div>
 
-    <script src="{{ app.router.static.url(filename='jquery-3.2.0.min.js') }}"></script>
-    <script src="{{ app.router.static.url(filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

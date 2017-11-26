@@ -2,7 +2,7 @@ from chat_take_aiohttp.helpers.utils import add_message, redirect
 
 
 def login_required(func):
-    """ Allow only auth users """
+    """ Проверка авторизации """
     async def wrapped(self, *args, **kwargs):
         if self.request.user is None:
             add_message(self.request, 'info', 'LogIn to continue.')
@@ -12,7 +12,7 @@ def login_required(func):
 
 
 def anonymous_required(func):
-    """ Allow only anonymous users """
+    """ Пользователь должен быть анонимным """
     async def wrapped(self, *args, **kwargs):
         if self.request.user is not None:
             add_message(

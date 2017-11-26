@@ -1,5 +1,5 @@
 def get_messages(request):
-    """ Get messages from session and empty """
+    """ Получить сообщения в шаблоне """
     messages = request.session.get('messages', [])
     request.session['messages'] = []
     return messages

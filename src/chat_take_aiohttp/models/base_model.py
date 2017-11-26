@@ -6,6 +6,6 @@ database = peewee_async.PostgresqlDatabase(None)
 
 
 class BaseModel(peewee.Model):
-    """ Base model with db Meta """
+    """ Базовая модель """
     class Meta:
         database = database

@@ -3,6 +3,7 @@ import hashlib
 import aiohttp_jinja2
 from datetime import time
 from aiohttp import web
+from typing import Tuple, Dict, Any
 
 from chat_take_aiohttp.helpers.utils import redirect, add_message
 from chat_take_aiohttp.helpers.decorators import (
@@ -10,16 +11,20 @@ from chat_take_aiohttp.helpers.decorators import (
     anonymous_required,
 )
 from chat_take_aiohttp.models.users import Users
+from chat_take_aiohttp.models.rooms import Room
 
 
 class Ping(web.View):
     """ ping """
-    async def get(self):
+    async def get(self) -> web.Response:
         return web.Response(text='OK')
 
 
 class HandlersMixinAccount:
-    async def is_valid(self, username, password):
+    """Миксин для работы с пользователями"""
+
+    async def is_valid(self, username: str, password: str) -> bool:
+        """Валидация парвметров"""
         if (
             re.match(r'^[a-z]\w{0,9}$', username) and
             re.match(r'^[a-z]\w{0,9}$', password)
@@ -33,9 +38,9 @@ class HandlersMixinAccount:
         )
         return False
 
-    async def login_user(self, user):
-        """ Put user to session and redirect to Index """
-        self.request.session['user'] = str(user.id)
+    async def login_user(self, user: Users) -> None:
+        """ Сетим пользователю сессию """
+        self.request.session['user'] = str(user.users_id)
         self.request.session['time'] = str(time())
         add_message(
             self.request,
@@ -44,7 +49,7 @@ class HandlersMixinAccount:
         )
         redirect(self.request, 'index')
 
-    async def get_normalize_data(self):
+    async def get_normalize_data(self) -> Tuple[str, str]:
         data = await self.request.post()
         self.request.post()
         username = data.get('username', '').lower()
@@ -59,11 +64,12 @@ class Register(HandlersMixinAccount, web.View):
 
     @anonymous_required
     @aiohttp_jinja2.template(template_name)
-    async def get(self):
+    async def get(self) -> Dict:
         return {}
 
     @anonymous_required
-    async def post(self):
+    async def post(self) -> None:
+        """Cоздаем пользователя"""
         username, password = await self.get_normalize_data()
 
         is_valid = await self.is_valid(username, password)
@@ -93,11 +99,11 @@ class Login(HandlersMixinAccount, web.View):
 
     @anonymous_required
     @aiohttp_jinja2.template(template_name)
-    async def get(self):
+    async def get(self) -> Dict:
         return {}
 
     @anonymous_required
-    async def post(self):
+    async def post(self) -> None:
         username, password = await self.get_normalize_data()
         is_valid = await self.is_valid(username, password)
         if not is_valid:
@@ -113,8 +119,8 @@ class Login(HandlersMixinAccount, web.View):
             add_message(self.request, 'danger', f'User {username} not found')
             redirect(self.request, 'login')
 
-    async def login_user(self, user):
-        self.request.session['user'] = str(user.id)
+    async def login_user(self, user: Users) -> None:
+        self.request.session['user'] = str(user.users_id)
         self.request.session['time'] = str(time())
         add_message(self.request, 'info', f'Hello {user}!')
         redirect(self.request, 'index')
@@ -123,7 +129,22 @@ class Login(HandlersMixinAccount, web.View):
 class Logout(web.View):
     """ Выход пользователя """
     @login_required
-    async def get(self):
+    async def get(self) -> None:
         self.request.session.pop('user')
         add_message(self.request, 'info', 'You are logged out')
         redirect(self.request, 'index')
+
+
+class Index(web.View):
+
+    """ Main page view """
+
+    template_name = 'index.html'
+
+    @aiohttp_jinja2.template(template_name)
+    async def get(self) -> Dict[str, Any]:
+        if self.request.user:
+            return {
+                'chat_rooms': await Room.all_rooms(self.request.app.objects)
+            }
+        return {}
