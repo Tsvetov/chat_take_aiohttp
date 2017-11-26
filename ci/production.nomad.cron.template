@@ -16,7 +16,7 @@ job "chat_take_aiohttp-cron" {
       driver = "docker"
 
       config {
-        image = "docker-infra.cian.ru/chat_take_aiohttp:$IMAGE_TAG"
+        image = "docker-infra.ru/chat_take_aiohttp:$IMAGE_TAG"
 
         auth {
           username = "$DOCKER_REGISTRY_USERNAME"
