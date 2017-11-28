@@ -6,5 +6,5 @@ DATABASE = {
     'database': 'chat_take_aiohttp',
     'password': '123',
     'user': 'chat_user',
-    'host': 'localhost:5432',
+    'host': 'postgres:5432',
 }
