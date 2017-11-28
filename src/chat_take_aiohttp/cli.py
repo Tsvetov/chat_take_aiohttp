@@ -88,7 +88,7 @@ async def shutdown(server, app: web.Application) -> None:
 
 
 @cli.command()
-@click.option('--host', type=str, default='127.0.0.1')
+@click.option('--host', type=str, default='0.0.0.0')
 @click.option('--port', type=int, default=8000)
 def serve(host: str, port: int) -> None:
     """Запуск сервера"""
