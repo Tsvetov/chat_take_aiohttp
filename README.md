@@ -25,3 +25,10 @@ chat_take_aiohttp serve
 5. Доступен по
 localhost:8000
 
+Как собрать из докера:
+
+1. склонировать проект git clone https://github.com/Tsvetov/chat_take_aiohttp.git
+2 в корне проекта docker-compose build
+3. там же: docker-compose up
+4. http://localhost:8000/ в браузере
+
